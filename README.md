@@ -83,7 +83,6 @@ query_ids <- GET(
 # Extracting the content of the response of GET
 ids <- httr::content(query_ids)
 char_list <- as.character(ids)
-char_list
 ```
 
 The query will return an XML object, we can turn it into a character
@@ -105,10 +104,14 @@ extract that information. Fill out the following lines of code:
 ids <- as.character(ids)
 
 # Find all the ids 
-ids <- stringr::str_extract_all(ids, "PATTERN")[[1]]
+ids <- stringr::str_extract_all(ids, "<Id>.*?</Id>")[[1]]
 
 # Remove all the leading and trailing <Id> </Id>. Make use of "|"
-ids <- stringr::str_remove_all(ids, "PATTERN")
+ids <- stringr::str_remove_all(ids, "<Id>|</Id>")
+
+char_list <- as.character(ids)
+
+char_list
 ```
 
 With the ids in hand, we can now try to get the abstracts of the papers.
@@ -132,11 +135,18 @@ around `I()` (as you would do in a formula in R). For example, the text
 behavior, you would need to do the following `I("123,456")`.
 
 ``` r
+baseline_url <- "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+
+query_params <- list(
+  db = "pubmed",
+  id = I("ids separated by comma, e.g., '1232131,546464,13131'"),
+  retmax = 300,
+  rettype = "abstract"
+)
+
 publications <- GET(
-  url   = "BASELINE URL HERE",
-  query = list(
-    "PARAMETERS OF THE QUERY"
-    )
+  url   = baseline_url,
+  query = query_params
 )
 
 # Turning the output into character vector
