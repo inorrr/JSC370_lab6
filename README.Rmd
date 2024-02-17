@@ -152,9 +152,6 @@ publications <- GET(
 publications <- httr::content(publications)
 publications_txt <- as.character(publications)
 ```
-```{r}
-publications_txt 
-```
 
 With this in hand, we can now analyze the data. This is also a good time for committing and pushing your work!
 
@@ -168,9 +165,10 @@ Using the function `stringr::str_extract_all()` applied on `publications_txt`, c
 Write a regular expression that captures all such instances
 
 ```{r univ-institute-regex, eval = FALSE}
+library(stringr)
 institution <- str_extract_all(
   publications_txt,
-  "[YOUR REGULAR EXPRESSION HERE]"
+  "\\b(?:University\\sof|.*?\\sInstitute\\sof)\\s[^\\s,]+"
   ) 
 institution <- unlist(institution)
 as.data.frame(table(institution))
@@ -185,8 +183,8 @@ And tabulate the results
 
 ```{r school-department, eval = FALSE}
 schools_and_deps <- str_extract_all(
-  abstracts_txt,
-  "[YOUR REGULAR EXPRESSION HERE]"
+  publications_txt,
+  "\\b(?:School\\sof|Department\\sof)\\s[^\\s,]+"
   )
 as.data.frame(table(schools_and_deps))
 ```

@@ -110,8 +110,6 @@ ids <- stringr::str_extract_all(ids, "<Id>.*?</Id>")[[1]]
 ids <- stringr::str_remove_all(ids, "<Id>|</Id>")
 
 char_list <- as.character(ids)
-
-char_list
 ```
 
 With the ids in hand, we can now try to get the abstracts of the papers.
@@ -135,11 +133,13 @@ around `I()` (as you would do in a formula in R). For example, the text
 behavior, you would need to do the following `I("123,456")`.
 
 ``` r
+ids_string <- paste(char_list, collapse = ",")
+
 baseline_url <- "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
 
 query_params <- list(
   db = "pubmed",
-  id = I("ids separated by comma, e.g., '1232131,546464,13131'"),
+  id = I(ids_string),
   retmax = 300,
   rettype = "abstract"
 )
@@ -168,9 +168,10 @@ Using the function `stringr::str_extract_all()` applied on
 Write a regular expression that captures all such instances
 
 ``` r
+library(stringr)
 institution <- str_extract_all(
   publications_txt,
-  "[YOUR REGULAR EXPRESSION HERE]"
+  "\\b(?:University\\sof|.*?\\sInstitute\\sof)\\s[^\\s,]+"
   ) 
 institution <- unlist(institution)
 as.data.frame(table(institution))
@@ -186,8 +187,8 @@ And tabulate the results
 
 ``` r
 schools_and_deps <- str_extract_all(
-  abstracts_txt,
-  "[YOUR REGULAR EXPRESSION HERE]"
+  publications_txt,
+  "\\b(?:School\\sof|Department\\sof)\\s[^\\s,]+"
   )
 as.data.frame(table(schools_and_deps))
 ```
