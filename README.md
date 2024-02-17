@@ -215,33 +215,44 @@ of `pub_char_list`. You can either use `sapply()` as we just did, or
 simply take advantage of vectorization of `stringr::str_extract`
 
 ``` r
-abstracts <- str_extract(pub_char_list, "[YOUR REGULAR EXPRESSION]")
-abstracts <- str_remove_all(abstracts, "[CLEAN ALL THE HTML TAGS]")
-abstracts <- str_remove_all(abstracts, "[CLEAN ALL EXTRA WHITE SPACE AND NEW LINES]")
-# alternatively, you can also use str_replace_all(abstracts, "[ORIGINAL]", "[REPLACEMENT]")
+abstracts <- str_extract(pub_char_list, "<AbstractText>.*?</AbstractText>")
+abstracts <- str_replace_all(abstracts, "<.*?>", "")
+abstracts <- str_replace_all(abstracts, "\\s+", " ")
 ```
 
 - How many of these don’t have an abstract?
 
-*Answer here.*
+``` r
+missing_abstracts <- sum(is.na(abstracts))
+
+print(paste("# missing abstract:", missing_abstracts))
+```
+
+*Answer here.* 188 articles are missing abstract
 
 Now, the title
 
 ``` r
-titles <- str_extract(pub_char_list, "[YOUR REGULAR EXPRESSION]")
-titles <- str_remove_all(titles, "[CLEAN ALL THE HTML TAGS]")
+titles <- str_extract(pub_char_list, "<ArticleTitle>.*?</ArticleTitle>")
+titles <- str_replace_all(titles, "<.*?>", "")
 ```
 
 - How many of these don’t have a title ?
 
-*Answer here.*
+``` r
+missing_title <- sum(is.na(titles))
+
+print(paste("# missing title:", missing_title))
+```
+
+*Answer here.* none is missing title.
 
 Finally, put everything together into a single `data.frame` and use
 `knitr::kable` to print the results
 
 ``` r
 database <- data.frame(
-  "[DATA TO CONCATENATE]"
+  ArticleTitle = titles, AbstractText = abstracts
 )
 knitr::kable(database)
 
